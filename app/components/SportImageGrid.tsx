@@ -30,6 +30,8 @@ export default function SportImageGrid({ heading, buttonLabel, buttonHref, heroI
     if (!section || !pin || images.length === 0) return;
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Браузърът сам движи плочките от скрола (.pin-grid в globals.css) – JS не трябва
+    if (!reduceMotion && CSS.supports("animation-timeline: view()")) return;
     const n = images.length;
     let frame = 0;
     let vh = 0;
@@ -99,7 +101,7 @@ export default function SportImageGrid({ heading, buttonLabel, buttonHref, heroI
   return (
     <section
       ref={sectionRef}
-      className="relative"
+      className="pin-grid relative"
       style={{ height: `${(images.length + 1) * 100}vh` }}
     >
       <div ref={pinRef} className="sticky top-0 h-screen overflow-hidden">
@@ -127,10 +129,17 @@ export default function SportImageGrid({ heading, buttonLabel, buttonHref, heroI
             ref={(el) => {
               tileRefs.current[i] = el;
             }}
-            className={`absolute top-0 h-screen w-full overflow-hidden lg:w-1/2 ${
+            className={`pin-grid__tile absolute top-0 h-screen w-full overflow-hidden will-change-transform lg:w-1/2 ${
               i % 2 === 0 ? "left-0" : "left-0 lg:left-1/2"
             }`}
-            style={{ zIndex: 10 + i, transform: "translate3d(0,100%,0)" }}
+            style={
+              {
+                zIndex: 10 + i,
+                transform: "translate3d(0,100%,0)",
+                "--from": `${(i / images.length) * 100}%`,
+                "--to": `${((i + 1) / images.length) * 100}%`,
+              } as React.CSSProperties
+            }
           >
             <Image
               src={img.src}

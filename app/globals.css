@@ -68,3 +68,20 @@ body {
   .mobile-drawer,
   .mobile-drawer .drawer-item { transition: none; }
 }
+
+/* Начална страница – плочките изплуват от скрола директно в CSS (без JS на всеки кадър).
+   На iPhone JS-версията изоставаше с кадър от скрола и „лагваше“. */
+@keyframes pin-tile-in {
+  from { transform: translate3d(0, 100%, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .pin-grid { view-timeline: --pin-grid block; }
+    .pin-grid__tile {
+      animation: pin-tile-in linear both;
+      animation-timeline: --pin-grid;
+      animation-range: contain var(--from) contain var(--to);
+    }
+  }
+}
